@@ -16,9 +16,11 @@ mod cylinder;
 mod rectangular_prism;
 mod sphere;
 mod torus;
+mod gyroid;
 
 pub use csg::*;
 pub use cylinder::*;
 pub use rectangular_prism::*;
 pub use sphere::*;
 pub use torus::*;
+pub use gyroid::*;

@@ -39,7 +39,7 @@ use isosurface::{
     distance::Signed,
     extractor::IndexedInterleavedNormals,
     feature::ParticleBasedMinimisation,
-    implicit::{Cylinder, Difference, Intersection, RectangularPrism, Sphere, Torus, Union},
+    implicit::{Cylinder, Difference, Intersection, RectangularPrism, Sphere, Torus, Gyroid, Union},
     math::Vec3,
     sampler::Sampler,
     source::CentralDifference,
@@ -91,6 +91,13 @@ where
                 RectangularPrism::new(Vec3::from_scalar(0.2)),
             ))),
             "Sphere intersected with Cube",
+        ),
+        (
+            DemoSource::new(CentralDifference::new(Intersection::new(
+                RectangularPrism::new(Vec3::from_scalar(0.2)),
+                Gyroid::new(0.15, 0.2 / (2.0 * 3.141592))
+            ))),
+            "Gyroid unit cell"
         ),
     ];
 
