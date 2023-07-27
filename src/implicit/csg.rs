@@ -118,10 +118,10 @@ mod tests {
 
         let u = Union::new(a.clone(), b.clone());
 
-        assert_eq!(u.sample_scalar(Vec3::zero()).0, -2.0);
+        assert_eq!(u.sample_scalar(Vec3::zero()).0, 0.0);
         assert_eq!(u.sample_scalar(Vec3::new(4.0, 4.0, 1.0)).0, 0.0);
-        assert_eq!(u.sample_scalar(Vec3::new(0.0, 0.0, 8.0)).0, 4.0);
-        assert_eq!(u.sample_scalar(Vec3::new(8.0, 0.0, 0.0)).0, 4.0);
+        assert_eq!(u.sample_scalar(Vec3::new(0.0, 0.0, 8.0)).0, 2.0);
+        assert_eq!(u.sample_scalar(Vec3::new(8.0, 0.0, 0.0)).0, 2.0);
 
         assert_eq!(u.sample_vector(Vec3::zero()).0, Vec3::new(-4.0, -4.0, -4.0));
         assert_eq!(u.sample_vector(Vec3::new(4.0, 4.0, 1.0)).0, Vec3::zero());
@@ -149,9 +149,9 @@ mod tests {
 
         let i = Intersection::new(a.clone(), b.clone());
 
-        assert_eq!(i.sample_scalar(Vec3::zero()).0, -1.0);
+        assert_eq!(i.sample_scalar(Vec3::zero()).0, 0.0);
         assert_eq!(i.sample_scalar(Vec3::new(2.0, 2.0, 1.0)).0, 0.0);
-        assert_eq!(i.sample_scalar(Vec3::new(0.0, 0.0, 8.0)).0, 7.0);
+        assert_eq!(i.sample_scalar(Vec3::new(0.0, 0.0, 8.0)).0, 14.0);
         assert_eq!(i.sample_scalar(Vec3::new(8.0, 0.0, 0.0)).0, 6.0);
 
         assert_eq!(i.sample_vector(Vec3::zero()).0, Vec3::new(-2.0, -2.0, -1.0));

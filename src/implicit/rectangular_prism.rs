@@ -35,10 +35,20 @@ impl RectangularPrism {
 
 impl ScalarSource for RectangularPrism {
     fn sample_scalar(&self, p: Vec3) -> Signed {
-        let q = p.abs() - self.half_extent;
-        Signed(q.max(Vec3::zero()).len() + q.max_component().min(0.0))
+        let center = self.half_extent / 2.0;
+        let r = p - center;
+
+        // If the observation point is at the center,
+        // handle the special case to avoid div/0
+        if r.abs().max_component() == 0.0 {
+            return Signed(-1.0);
+        }
+        // Otherwise, use the normalized distance from the center
+        // to a side
+        Signed((r / center).abs().max_component() - 1.0)
     }
 }
+
 
 impl VectorSource for RectangularPrism {
     fn sample_vector(&self, p: Vec3) -> Directed {
@@ -75,7 +85,14 @@ impl VectorSource for RectangularPrism {
 
 impl HermiteSource for RectangularPrism {
     fn sample_normal(&self, p: Vec3) -> Vec3 {
-        p.clamp_to_cardinal_axis()
+        let center = self.half_extent / 2.0;
+        let r = p - center;
+        let r_norm = r / center;
+        let ind = r_norm.abs().max_component_index();
+        let mut normal = Vec3::zero();
+        normal[ind] = r_norm[ind];
+
+        normal
     }
 }
 
@@ -87,10 +104,13 @@ mod tests {
     fn test_rectangular_prism() {
         let prism = RectangularPrism::new(Vec3::new(1.0, 2.0, 4.0));
 
-        assert_eq!(prism.sample_scalar(Vec3::zero()).0, -1.0);
+        assert_eq!(prism.sample_scalar(Vec3::zero()).0, 0.0);
         assert_eq!(prism.sample_scalar(Vec3::new(1.0, 2.0, 4.0)).0, 0.0);
-        assert_eq!(prism.sample_scalar(Vec3::new(0.0, 0.0, 8.0)).0, 4.0);
-        assert_eq!(prism.sample_scalar(Vec3::new(8.0, 0.0, 0.0)).0, 7.0);
+
+        assert_eq!(prism.sample_scalar(Vec3::new(0.0, 0.0, 8.0)).0, 2.0);
+        assert_eq!(prism.sample_scalar(Vec3::new(8.0, 0.0, 0.0)).0, 14.0);
+
+        assert_eq!(prism.sample_scalar(prism.half_extent / 2.0).0, -1.0);
 
         assert_eq!(
             prism.sample_vector(Vec3::zero()).0,
@@ -122,10 +142,40 @@ mod tests {
         );
         assert_eq!(
             prism
-                .sample_normal(Vec3::new(8.0, 0.0, 0.0))
+                .sample_normal(Vec3::new(0.0, 8.0, 0.0))
+                .normalised()
+                .unwrap(),
+            Vec3::new(0.0, 1.0, 0.0)
+        );
+        assert_eq!(
+            prism
+                .sample_normal(Vec3::new(8.0, 0.1, 0.1))
                 .normalised()
                 .unwrap(),
             Vec3::new(1.0, 0.0, 0.0)
         );
+
+        assert_eq!(
+            prism
+                .sample_normal(Vec3::new(0.0, 0.0, -8.0))
+                .normalised()
+                .unwrap(),
+            Vec3::new(0.0, 0.0, -1.0)
+        );
+        assert_eq!(
+            prism
+                .sample_normal(Vec3::new(0.0, -8.0, 0.0))
+                .normalised()
+                .unwrap(),
+            Vec3::new(0.0, -1.0, 0.0)
+        );
+        assert_eq!(
+            prism
+                .sample_normal(Vec3::new(-8.0, 0.0, 0.0))
+                .normalised()
+                .unwrap(),
+            Vec3::new(-1.0, 0.0, 0.0)
+        );
+
     }
 }
