@@ -95,7 +95,7 @@ where
         (
             DemoSource::new(CentralDifference::new(Intersection::new(
                 RectangularPrism::new(Vec3::from_scalar(0.2)),
-                Gyroid::new(0.15, 0.2 / (2.0 * 3.141592))
+                Gyroid::new(0.1, 0.2 / (2.0 * 3.141592))
             ))),
             "Gyroid unit cell"
         ),

@@ -35,8 +35,17 @@ impl RectangularPrism {
 
 impl ScalarSource for RectangularPrism {
     fn sample_scalar(&self, p: Vec3) -> Signed {
-        let q = p.abs() - self.half_extent;
-        Signed(q.max(Vec3::zero()).len() + q.max_component().min(0.0))
+        let center = self.half_extent / 2.0;
+        let r = p - center;
+
+        // If the observation point is at the center,
+        // handle the special case to avoid div/0
+        if r.abs().max_component() == 0.0 {
+            return Signed(-1.0);
+        }
+        // Otherwise, use the normalized distance from the center
+        // to a side
+        Signed((r / center).abs().max_component() - 1.0)
     }
 }
 
@@ -75,7 +84,15 @@ impl VectorSource for RectangularPrism {
 
 impl HermiteSource for RectangularPrism {
     fn sample_normal(&self, p: Vec3) -> Vec3 {
-        p.clamp_to_cardinal_axis()
+        let center = self.half_extent / 2.0;
+        let r = p - center;
+        let r_norm = (r / center) - 1.0;
+        let ind = r_norm.abs().min_component_index();
+        let mut normal = Vec3::zero();
+        normal[ind] = r_norm[ind];
+
+        // normal
+        Vec3::zero()
     }
 }
 
