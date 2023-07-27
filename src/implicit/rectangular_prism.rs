@@ -90,7 +90,7 @@ impl HermiteSource for RectangularPrism {
         let r_norm = r / center;
         let ind = r_norm.abs().max_component_index();
         let mut normal = Vec3::zero();
-        normal[ind] = r_norm[ind];
+        normal[ind] = 1.0 * r_norm[ind].signum();
 
         normal
     }
